@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Please Forgive Me? 🥺</title>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #ff5e78;
+            --primary-light: #ff8fa3;
+            --secondary: #ff9a8b;
+            --bg-start: #ffecd2;
+            --bg-end: #fcb69f;
+            --success: #4ecdc4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Gradient Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef, #ff9a9e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Hearts Background */
+        .heart-bg {
+            position: fixed;
+            font-size: 1.5rem;
+            opacity: 0;
+            z-index: -1;
+            user-select: none;
+            pointer-events: none;
+            animation: floatUp 8s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% { 
+                transform: translateY(100vh) rotate(0deg) scale(0.5); 
+                opacity: 0; 
+            }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { 
+                transform: translateY(-100vh) rotate(720deg) scale(1.2); 
+                opacity: 0; 
+            }
+        }
+
+        /* Cursor Heart Trail */
+        .cursor-heart {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.2rem;
+            z-index: 9999;
+            animation: heartPop 1s ease-out forwards;
+        }
+
+        @keyframes heartPop {
+            0% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(0) translateY(-50px); opacity: 0; }
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.5rem;
+            border-radius: 30px;
+            box-shadow: 
+                0 20px 60px rgba(255, 94, 120, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #ff6b9d, #ffc3a0, #ff6b9d, #ffc3a0);
+            background-size: 400% 400%;
+            border-radius: 32px;
+            z-index: -1;
+            animation: borderGlow 3s ease infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card.shake {
+            animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px) rotate(-1deg); }
+            20%, 80% { transform: translateX(4px) rotate(1deg); }
+            30%, 50%, 70% { transform: translateX(-6px) rotate(-1deg); }
+            40%, 60% { transform: translateX(6px) rotate(1deg); }
+        }
+
+        /* Mini Photo */
+        .mini-photo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            object-fit: cover;
+            position: absolute;
+            top: -35px;
+            right: 25px;
+            transform: rotate(8deg);
+            transition: transform 0.3s ease;
+            animation: photoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes photoFloat {
+            0%, 100% { transform: rotate(8deg) translateY(0); }
+            50% { transform: rotate(12deg) translateY(-5px); }
+        }
+
+        .mini-photo:hover {
+            transform: rotate(0deg) scale(1.1);
+        }
+
+        /* Sticker GIF */
+        .sticker {
+            height: 120px;
+            margin-bottom: 10px;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        @media (min-width: 480px) {
+            .sticker { height: 150px; }
+        }
+
+        /* Stage Indicator */
+        .stage-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .stage-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .stage-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        .stage-dot.passed {
+            background: var(--primary-light);
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Indie Flower', cursive;
+            color: #ff3355;
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        p {
+            color: #666;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Forgiveness Meter */
+        .meter-container {
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .meter-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meter-bar {
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b9d, #ff3355);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .meter-fill::after {
+            content: '💕';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        /* Counter Badge */
+        .attempt-counter {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Button Area */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            min-height: 80px;
+            position: relative;
+            padding: 10px;
+        }
+
+        button {
+            padding: 14px 28px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        #yesBtn {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff8fa3 100%);
+            color: white;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            box-shadow: 0 8px 25px rgba(255, 94, 120, 0.4);
+            z-index: 100;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #yesBtn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1) translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 94, 120, 0.5);
+        }
+
+        #yesBtn:active {
+            transform: scale(1.05);
+        }
+
+        #noBtn {
+            background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+            color: #555;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #noBtn:hover {
+            background: linear-gradient(135deg, #d0d0d0 0%, #b0b0b0 100%);
+        }
+
+        #noBtn.shrinking {
+            animation: shrink 0.3s ease forwards;
+        }
+
+        @keyframes shrink {
+            to { transform: scale(0.8); opacity: 0.7; }
+        }
+
+        #noBtn.spinning {
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #noBtn.wobble {
+            animation: wobble 0.5s ease;
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-15deg); }
+            75% { transform: rotate(15deg); }
+        }
+
+        /* Envelope Icon */
+        .envelope-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 50;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+            animation: envelopeBounce 2s infinite;
+        }
+
+        @keyframes envelopeBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(0deg); }
+            40% { transform: translateY(-15px) rotate(-5deg); }
+            60% { transform: translateY(-8px) rotate(5deg); }
+        }
+
+        .envelope-icon:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Hint Text */
+        .envelope-hint {
+            position: fixed;
+            bottom: 60px;
+            right: 10px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            opacity: 0;
+            animation: hintFade 4s ease 3s forwards;
+        }
+
+        @keyframes hintFade {
+            0%, 100% { opacity: 0; transform: translateY(10px); }
+            20%, 80% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hidden Class */
+        .hidden { 
+            display: none !important; 
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .note-card {
+            background: linear-gradient(135deg, #fff9c4, #fff59d);
+            padding: 30px 25px;
+            border-radius: 5px;
+            max-width: 320px;
+            width: 100%;
+            transform: rotate(-2deg);
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.3),
+                inset 0 0 30px rgba(255,255,255,0.5);
+            text-align: center;
+            font-family: 'Indie Flower', cursive;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            position: relative;
+            animation: noteAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes noteAppear {
+            0% { transform: rotate(-2deg) scale(0.5); opacity: 0; }
+            100% { transform: rotate(-2deg) scale(1); opacity: 1; }
+        }
+
+        .note-card::before {
+            content: '📌';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+        }
+
+        .note-card small {
+            display: block;
+            margin-top: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        /* Success Card Specific */
+        #successCard {
+            background: linear-gradient(135deg, #fff 0%, #e8f5e9 100%);
+        }
+
+        #successCard h1 {
+            color: #4ecdc4;
+            animation: celebrateTitle 0.5s ease;
+        }
+
+        @keyframes celebrateTitle {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        #successCard .sticker {
+            animation: jump 0.5s ease infinite alternate;
+        }
+
+        @keyframes jump {
+            to { transform: translateY(-10px); }
+        }
+
+        /* Promise List */
+        .promise-list {
+            text-align: left;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .promise-list li {
+            margin: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            list-style: none;
+            opacity: 0;
+            animation: promiseAppear 0.5s ease forwards;
+        }
+
+        .promise-list li::before {
+            content: '💝';
+            position: absolute;
+            left: 0;
+        }
+
+        .promise-list li:nth-child(1) { animation-delay: 0.3s; }
+        .promise-list li:nth-child(2) { animation-delay: 0.5s; }
+        .promise-list li:nth-child(3) { animation-delay: 0.7s; }
+        .promise-list li:nth-child(4) { animation-delay: 0.9s; }
+
+        @keyframes promiseAppear {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .card {
+                padding: 1.2rem;
+                border-radius: 25px;
+            }
+            
+            .mini-photo {
+                width: 55px;
+                height: 55px;
+                top: -28px;
+                right: 15px;
+            }
+
+            .btn-group {
+                gap: 10px;
+            }
+
+            button {
+                padding: 12px 20px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                padding: 2.5rem;
+            }
+
+            .sticker {
+                height: 180px;
+            }
+
+            .meter-container {
+                max-width: 300px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .card {
+                background: rgba(30, 30, 40, 0.95);
+            }
+            h1 { color: #ff8fa3; }
+            p { color: #bbb; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Gradient Background -->
+    <div class="bg-gradient"></div>
+
+    <!-- Heart Container -->
+    <div id="heartContainer"></div>
+
+    <!-- Secret Envelope -->
+    <div class="envelope-icon" onclick="openSecret()" aria-label="Open secret note">💌</div>
+    <div class="envelope-hint">Psst... a secret note! 👀</div>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Main Card -->
+        <div class="card" id="mainCard">
+            <div class="attempt-counter" id="attemptCounter">Attempts: 0 😅</div>
+            
+            <img src="/sorry/ne.jpg" 
+                 class="mini-photo" alt="Us together" loading="lazy">
+
+            <!-- Stage Indicator -->
+            <div class="stage-indicator">
+                <div class="stage-dot active" id="dot1"></div>
+                <div class="stage-dot" id="dot2"></div>
+                <div class="stage-dot" id="dot3"></div>
+                <div class="stage-dot" id="dot4"></div>
+                <div class="stage-dot" id="dot5"></div>
+            </div>
+
+            <!-- Animated Sticker -->
+            <img id="stickerImg" class="sticker" 
+                 src="/sorry/peachmad-goma.gif" 
+                 alt="Pleading">
+
+            <h1 id="mainTitle">I'm Really Sorry 🥺</h1>
+            <p id="mainText">
+                I know I messed up big time...<br>
+                Can you find it in your heart to forgive me?
+            </p>
+
+            <!-- Forgiveness Meter -->
+            <div class="meter-container">
+                <div class="meter-label">
+                    <span>Forgiveness Meter</span>
+                    <span id="meterPercent">0%</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="meterFill"></div>
+                </div>
+            </div>
+
+            <div class="btn-group" id="btnGroup">
+                <button id="yesBtn">Yes, I Forgive You 💕</button>
+                <button id="noBtn">Hmm, No 😤</button>
+            </div>
+        </div>
+
+        <!-- Success Card -->
+        <div class="card hidden" id="successCard">
+            <img class="sticker" 
+                 src="/sorry/sorry-apology.gif" 
+                 alt="Happy celebration">
+            
+            <h1>You're the Best! 🎉</h1>
+            <p>Thank you for giving me another chance! I promise to do better!</p>
+            
+            <ul class="promise-list">
+                <li>I'll always listen to you</li>
+                <li>More cuddles & hugs incoming</li>
+                <li>Surprise treats just because</li>
+                <li>Forever grateful for your love</li>
+            </ul>
+            
+            <button id="restartBtn" onclick="location.reload()" 
+                    style="background: linear-gradient(135deg, #4ecdc4, #44a08d); margin-top: 15px;">
+                Read Again? 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- Secret Modal -->
+    <div class="modal-overlay" id="secretModal" onclick="closeSecret()">
+        <div class="note-card" onclick="event.stopPropagation()">
+            <p>
+                "You are my everything, and I can't imagine life without you.I know I have done something wrong, and I'm truly sorry from the bottom of my heart. Please forgive me for my mistakes. I promise to learn from them and be a better person for you. Your happiness means the world to me, and I will do whatever it takes to make things right again." 
+                <br><br>
+                💗 Forever yours
+            </p>
+            <small>Tap outside to close</small>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainCard = document.getElementById('mainCard');
+        const successCard = document.getElementById('successCard');
+        const stickerImg = document.getElementById('stickerImg');
+        const mainTitle = document.getElementById('mainTitle');
+        const mainText = document.getElementById('mainText');
+        const meterFill = document.getElementById('meterFill');
+        const meterPercent = document.getElementById('meterPercent');
+        const attemptCounter = document.getElementById('attemptCounter');
+        const btnGroup = document.getElementById('btnGroup');
+
+        // Stages configuration
+        const stages = [
+            {
+                title: "I'm Really Sorry 🥺",
+                text: "I know I messed up big time...<br>Can you find it in your heart to forgive me?",
+                gif: "/sorry/peachmad-goma.gif",
+                noText: "Hmm, No 😤"
+            },
+            {
+                title: "Please? Pretty Please? 🙏",
+                text: "I'll do anything to make it right!<br>What can I do to earn your forgiveness?",
+                gif: "/sorry/buniboo-and-bearuloo-bunny.gif",
+                noText: "Still No 😠"
+            },
+            {
+                title: "I'm Begging You! 😭",
+                text: "Look at what you're doing to me!<br>My heart can't take this...",
+                gif: "/sorry/kitten-love.gif",
+                noText: "Nope! 🙅"
+            },
+            {
+                title: "Don't Leave Me! 💔",
+                text: "I'll buy you food! Snacks! Anything!<br>Just please forgive me!",
+                gif: "https://media.giphy.com/media/BEob5qwFkSJ7G/giphy.gif",
+                noText: "Maybe... NOT!"
+            },
+            {
+                title: "OKAY FINE! 😤❤️",
+                text: "I know deep down you want to forgive me...<br>That YES button is looking pretty good right now!",
+                gif: "sorry/baby-brown.gif",
+                noText: "..."
+            }
+        ];
+
+        const noButtonAnimations = ['shrinking', 'spinning', 'wobble'];
+        
+        let clickCount = 0;
+        let currentStage = 0;
+        let meterValue = 0;
+
+        // Update UI based on stage
+        function updateStage() {
+            const stage = stages[Math.min(currentStage, stages.length - 1)];
+            
+            mainTitle.innerHTML = stage.title;
+            mainText.innerHTML = stage.text;
+            stickerImg.src = stage.gif;
+            noBtn.innerText = stage.noText;
+
+            // Update stage dots
+            document.querySelectorAll('.stage-dot').forEach((dot, index) => {
+                dot.classList.remove('active', 'passed');
+                if (index < currentStage) dot.classList.add('passed');
+                if (index === currentStage) dot.classList.add('active');
+            });
+        }
+
+        // Handle No button
+        function handleNo(e) {
+            if (e) e.preventDefault();
+            
+            clickCount++;
+            
+            // Update counter
+            const emojis = ['😅', '😰', '😢', '😭', '💀', '👻', '🤯', '😵', '🥴', '😵‍💫'];
+            const emoji = emojis[Math.min(clickCount - 1, emojis.length - 1)];
+            attemptCounter.textContent = `Attempts: ${clickCount} ${emoji}`;
+
+            // Shake card
+            mainCard.classList.add('shake');
+            setTimeout(() => mainCard.classList.remove('shake'), 600);
+
+            // Animate No button
+            const animClass = noButtonAnimations[clickCount % noButtonAnimations.length];
+            noBtn.classList.add(animClass);
+            setTimeout(() => noBtn.classList.remove(animClass), 500);
+
+            // Update meter (increases more with each click!)
+            meterValue = Math.min(meterValue + (5 + clickCount * 2), 99);
+            meterFill.style.width = meterValue + '%';
+            meterPercent.textContent = meterValue + '%';
+
+            // Progress stages
+            if (clickCount % 2 === 0 && currentStage < stages.length - 1) {
+                currentStage++;
+                updateStage();
+            }
+
+            // Grow YES button
+            const scale = 1 + (clickCount * 0.08);
+            yesBtn.style.transform = `scale(${Math.min(scale, 1.5)})`;
+
+            // Move No button randomly
+            moveNoButton();
+
+            // Shrink No button
+            const noScale = Math.max(1 - (clickCount * 0.05), 0.6);
+            noBtn.style.fontSize = `${Math.max(0.7, 1 - clickCount * 0.03)}rem`;
+
+            // Create floating hearts
+            createFloatingHeart(e);
+        }
+
+        function moveNoButton() {
+            const groupRect = btnGroup.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+            
+            const maxX = groupRect.width - btnRect.width - 10;
+            const maxY = Math.max(60, groupRect.height - btnRect.height);
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
+            noBtn.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        }
+
+        function createFloatingHeart(e) {
+            const heart = document.createElement('div');
+            heart.className = 'cursor-heart';
+            heart.innerHTML = ['💔', '😢', '🥺', '💕'][Math.floor(Math.random() * 4)];
+            heart.style.left = (e?.clientX || Math.random() * window.innerWidth) + 'px';
+            heart.style.top = (e?.clientY || Math.random() * window.innerHeight) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        // Success handler
+        function handleYes() {
+            mainCard.classList.add('hidden');
+            successCard.classList.remove('hidden');
+            document.querySelector('.envelope-icon').style.display = 'none';
+            document.querySelector('.envelope-hint').style.display = 'none';
+            
+            fireConfetti();
+            createHeartExplosion();
+        }
+
+        function fireConfetti() {
+            const duration = 4000;
+            const end = Date.now() + duration;
+
+            const colors = ['#ff5e78', '#ff8fa3', '#ffd700', '#ff6b9d', '#fff'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // Big burst
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: colors
+                });
+            }, 500);
+        }
+
+        function createHeartExplosion() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart-bg';
+                    heart.innerHTML = ['❤️', '💕', '💗', '💖', '💝', '🎉', '✨'][Math.floor(Math.random() * 7)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                    heart.style.fontSize = (Math.random() * 1 + 1) + 'rem';
+                    document.getElementById('heartContainer').appendChild(heart);
+                    setTimeout(() => heart.remove(), 10000);
+                }, i * 100);
+            }
+        }
+
+        // Event Listeners
+        noBtn.addEventListener('click', handleNo);
+        noBtn.addEventListener('touchstart', handleNo, { passive: false });
+        noBtn.addEventListener('mouseenter', (e) => {
+            if (clickCount > 2) handleNo(e);
+        });
+
+        yesBtn.addEventListener('click', handleYes);
+
+        // Secret Modal
+        function openSecret() {
+            document.getElementById('secretModal').classList.add('open');
+        }
+
+        function closeSecret() {
+            document.getElementById('secretModal').classList.remove('open');
+        }
+
+        // Background hearts
+        const heartEmojis = ['💕', '❤️', '💗', '💖', '🌸', '✨', '💐', '🦋'];
+        const heartContainer = document.getElementById('heartContainer');
+
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.className = 'heart-bg';
+            heart.innerHTML = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            heart.style.fontSize = (Math.random() * 1.5 + 0.8) + 'rem';
+            heartContainer.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 12000);
+        }, 1200);
+
+        // Cursor/touch heart trail
+        let lastHeartTime = 0;
+        document.addEventListener('mousemove', (e) => {
+            if (Date.now() - lastHeartTime > 150) {
+                lastHeartTime = Date.now();
+                if (Math.random() > 0.7) {
+                    const heart = document.createElement('div');
+                    heart.className = 'cursor-heart';
+                    heart.innerHTML = '💕';
+                    heart.style.left = e.clientX + 'px';
+                    heart.style.top = e.clientY + 'px';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 1000);
+                }
+            }
+        });
+
+        // Initialize
+        updateStage();
+    </script>
+</body>
+</html>
